@@ -1,0 +1,35 @@
+meta {
+  name: Submit Attendance
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/attendances/submit
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "username": "tester",
+    "attendanceTimeInLatitude": -6.1754049,
+    "attendanceTimeInLongitude": 106.827168,
+    "photoUrl": "https://lh3.googleusercontent.com/captured_face.jpg"
+  }
+}
+
+docs {
+  ### Submit Attendance (Clock In)
+  Sends the current attendance record including GPS coordinates and photo URL.
+  
+  **Request Body:**
+  * `username`: Subject of attendance
+  * `attendanceTimeInLatitude`: GPS Latitude
+  * `attendanceTimeInLongitude`: GPS Longitude
+  * `photoUrl`: Captured face verification image
+}

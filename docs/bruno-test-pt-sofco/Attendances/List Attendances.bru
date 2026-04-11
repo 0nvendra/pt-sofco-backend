@@ -1,0 +1,15 @@
+meta {
+  name: List Attendances
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/attendances
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}

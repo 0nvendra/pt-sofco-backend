@@ -1,0 +1,26 @@
+meta {
+  name: Get Profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/users/profile
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  ### Get Logged-in User Profile
+  Returns the complete profile information for the authenticated user.
+  
+  **Returns:**
+  * `username`: Current user identifier
+  * `email`: Official email address
+  * `fullName`: Full legal name
+  * `role`: User authority (USER, ADMIN)
+}

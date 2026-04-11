@@ -1,0 +1,27 @@
+meta {
+  name: Attendance Summary
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/api/attendances/summary
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+docs {
+  ### Attendance Statistics Summary
+  Returns the usage statistics for the currently authenticated user.
+  
+  **Response Fields:**
+  * `presentCount`: Days present in the current cycle
+  * `lateCount`: Days clocked in after the threshold (08:00 AM)
+  * `absentCount`: Days missed
+  * `paidLeaveCount`: Days on official leave
+  * `attendanceRate`: Percentage of successful attendances
+}

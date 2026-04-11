@@ -1,0 +1,34 @@
+meta {
+  name: Update Profile
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{base_url}}/api/users/update
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "fullName": "Marcus Holloway Updated",
+    "email": "m.holloway.new@sofco.id",
+    "password": "" 
+  }
+}
+
+docs {
+  ### Update Current User Profile
+  Modifies the details of the authenticated user.
+  Leave password empty to keep the existing one.
+  
+  **Editable Fields:**
+  * `fullName`
+  * `email`
+  * `password`
+}
