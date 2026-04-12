@@ -19,7 +19,7 @@ Welcome to the **Attendance Portal Backend**, a robust and secure REST API built
 ## ✨ Key Features
 
 - **JWT Authentication**: Secure login and session management.
-- **Attendance Submission**: 
+- **Attendance Submission**:
   - Captures and stores user face photos in Firebase.
   - Validates GPS coordinates (Latitude/Longitude).
   - High precision coordinate tracking.
@@ -32,11 +32,13 @@ Welcome to the **Attendance Portal Backend**, a robust and secure REST API built
 ## 🛠️ Getting Started
 
 ### Prerequisites
+
 - **JDK 21** or higher.
 - **Maven 3.x**.
 - **PostgreSQL** (Optional if using the cloud Neon DB).
 
 ### Configuration
+
 1. **Firebase Setup**:
    - Place your `serviceAccountKey.json` inside `src/main/resources/`.
    - Update `FirebaseStorageService.java` with your Firebase Bucket name if necessary.
@@ -50,9 +52,11 @@ Welcome to the **Attendance Portal Backend**, a robust and secure REST API built
    ```
 
 ### Running the Application
+
 ```bash
 mvn spring-boot:run
 ```
+
 The API will be available at `http://localhost:8080`.
 
 ---
@@ -60,27 +64,32 @@ The API will be available at `http://localhost:8080`.
 ## 📚 API Documentation
 
 ### Auth Endpoints
+
 - `POST /api/auth/login`: Authenticate user and receive JWT.
 - `POST /api/auth/register`: Create a new user account.
 
 ### Attendance Endpoints
+
 - `POST /api/attendance/submit`: Submit attendance (Multipart Form Data).
 - `GET /api/attendance/history`: View attendance logs.
 
 ---
 
 ## 📁 Project Structure
+
 ```text
-src/main/java/com/example/test_pt_sofco_graha_gaji/id/
-├── controller/   # REST Controllers
-├── service/      # Business Logic
-├── repository/   # Data Access (JPA)
-├── model/        # Entities
-├── dto/          # Data Transfer Objects
-├── security/     # JWT & Security Config
-└── config/       # Other Configurations (Firebase, etc.)
+📂 backend (Java Spring Boot)
+│   └── 📂 src/main/java/com/example/test_pt_sofco_graha_gaji/id
+│       ├── 📂 config         # Firebase & App Configurations
+│       ├── 📂 controller     # REST API Endpoints
+│       ├── 📂 dto            # Data Transfer Objects
+│       ├── 📂 exception      # Global Exception Handling
+│       ├── 📂 model          # JPA Entities (PostgreSQL)
+│       ├── 📂 repository     # Data Access Layer
+│       ├── 📂 security       # JWT & Spring Security
+│       └── 📂 service        # Business Logic
 ```
 
 ---
 
-*Developed for PT Sofco Graha Gaji Technical Assessment.*
+_Developed for PT Sofco Graha Gaji Technical Assessment._
