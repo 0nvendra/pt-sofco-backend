@@ -5,10 +5,12 @@ import com.example.test_pt_sofco_graha_gaji.id.dto.AttendanceResponse;
 import com.example.test_pt_sofco_graha_gaji.id.dto.AttendanceSummaryResponse;
 import com.example.test_pt_sofco_graha_gaji.id.dto.WebResponse;
 import com.example.test_pt_sofco_graha_gaji.id.service.AttendanceService;
-import jakarta.validation.Valid;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
+import java.io.IOException;
 
 import java.util.List;
 
@@ -18,11 +20,19 @@ import java.util.List;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
-    @PostMapping("/submit")
-    @ResponseStatus(HttpStatus.CREATED)
-    public WebResponse<AttendanceResponse> submit(@Valid @RequestBody AttendanceRequest request) {
-        AttendanceResponse response = attendanceService.submitAttendance(request);
+    @PostMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public WebResponse<AttendanceResponse> submit(
+            @RequestPart("data") String dataJson, // Terima sebagai String dulu
+            @RequestPart("image") MultipartFile image
+    ) throws IOException {
+
+        // Parse manual untuk kompatibilitas maksimal dengan semua client
+        AttendanceRequest request = objectMapper.readValue(dataJson, AttendanceRequest.class);
+
+        AttendanceResponse response = attendanceService.submitAttendance(request, image);
+
         return WebResponse.<AttendanceResponse>builder()
                 .status("success")
                 .message("Attendance submitted successfully")

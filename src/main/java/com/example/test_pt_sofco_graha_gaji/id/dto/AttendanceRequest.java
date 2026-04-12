@@ -15,7 +15,6 @@ import java.util.UUID;
 @Builder
 public class AttendanceRequest {
 
-    @NotBlank(message = "Username is mandatory")
     private String username;
 
     private String photoUrl;

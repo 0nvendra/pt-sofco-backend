@@ -43,16 +43,16 @@ public class Attendance {
     @Column(name = "photo_url")
     private String photoUrl;
 
-    @Column(name = "attendance_time_in_latitude", precision = 9, scale = 6, nullable = false)
+    @Column(name = "attendance_time_in_latitude", precision = 11, scale = 8, nullable = false)
     private BigDecimal attendanceTimeInLatitude;
 
-    @Column(name = "attendance_time_in_longitude", precision = 9, scale = 6, nullable = false)
+    @Column(name = "attendance_time_in_longitude", precision = 11, scale = 8, nullable = false)
     private BigDecimal attendanceTimeInLongitude;
 
-    @Column(name = "attendance_time_out_latitude", precision = 9, scale = 6)
+    @Column(name = "attendance_time_out_latitude", precision = 11, scale = 8)
     private BigDecimal attendanceTimeOutLatitude;
 
-    @Column(name = "attendance_time_out_longitude", precision = 9, scale = 6)
+    @Column(name = "attendance_time_out_longitude", precision = 11, scale = 8)
     private BigDecimal attendanceTimeOutLongitude;
 
     @Column(name = "is_valid")

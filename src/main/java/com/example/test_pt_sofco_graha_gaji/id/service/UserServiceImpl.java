@@ -28,6 +28,19 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponse create(UserRequest request) {
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new ApiException("Username is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if (request.getEmail() == null || request.getEmail().isBlank()) {
+            throw new ApiException("Email is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if (request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new ApiException("Password is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if (request.getFullName() == null || request.getFullName().isBlank()) {
+            throw new ApiException("Full name is mandatory", HttpStatus.BAD_REQUEST);
+        }
+
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new ApiException("Username already exists", HttpStatus.BAD_REQUEST);
         }

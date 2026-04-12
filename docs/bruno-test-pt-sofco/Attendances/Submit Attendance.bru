@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{base_url}}/api/attendances/submit
-  body: json
+  body: multipart-form
   auth: bearer
 }
 
@@ -14,22 +14,37 @@ auth:bearer {
   token: {{token}}
 }
 
-body:json {
-  {
-    "username": "tester",
-    "attendanceTimeInLatitude": -6.1754049,
-    "attendanceTimeInLongitude": 106.827168,
-    "photoUrl": "https://lh3.googleusercontent.com/captured_face.jpg"
-  }
+body:multipart-form {
+  data: {"attendanceTimeInLatitude": -0.477961, "attendanceTimeInLongitude": 117.165098}
+  image: @file(attendance_photo.jpg)
 }
 
 docs {
   ### Submit Attendance (Clock In)
-  Sends the current attendance record including GPS coordinates and photo URL.
-  
-  **Request Body:**
-  * `username`: Subject of attendance
-  * `attendanceTimeInLatitude`: GPS Latitude
-  * `attendanceTimeInLongitude`: GPS Longitude
-  * `photoUrl`: Captured face verification image
+  Mengirimkan data absensi menggunakan `multipart/form-data`.
+  Endpoint ini memerlukan dua part:
+
+  **Part 1 - `data` (Content-Type: application/json):**
+  ```json
+  {
+    "username": "testuser",
+    "attendanceTimeInLatitude": -0.477961,
+    "attendanceTimeInLongitude": 117.165098
+  }
+  ```
+  * `username`: Username akun yang sedang login
+  * `attendanceTimeInLatitude`: Koordinat GPS Latitude saat clock-in
+  * `attendanceTimeInLongitude`: Koordinat GPS Longitude saat clock-in
+
+  **Part 2 - `image` (Content-Type: image/jpeg):**
+  * File gambar hasil capture kamera (face verification photo)
+
+  **Response (201 Created):**
+  ```json
+  {
+    "status": "success",
+    "message": "Attendance submitted successfully",
+    "data": { ... }
+  }
+  ```
 }

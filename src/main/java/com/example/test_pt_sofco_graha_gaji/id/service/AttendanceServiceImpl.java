@@ -20,17 +20,21 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
 
     private final AttendanceRepository attendanceRepository;
     private final UserRepository userRepository;
+    private final FirebaseStorageService firebaseStorageService;
 
     @Override
     @Transactional
-    public AttendanceResponse submitAttendance(AttendanceRequest request) {
+    public AttendanceResponse submitAttendance(AttendanceRequest request, MultipartFile file) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         log.info("Submitting attendance for user: {}", username);
 
@@ -43,18 +47,29 @@ public class AttendanceServiceImpl implements AttendanceService {
             throw new ApiException("Attendance already submitted for today", HttpStatus.BAD_REQUEST);
         }
 
-        // 3. Manual Validation: Check location data if required
+        // 3. Manual Validation: Check location data
         if (request.getAttendanceTimeInLatitude() == null || request.getAttendanceTimeInLongitude() == null) {
-            throw new ApiException("Location coordinates (latitude and longitude) are mandatory", HttpStatus.BAD_REQUEST);
+            throw new ApiException("Location coordinates are mandatory", HttpStatus.BAD_REQUEST);
+        }
+
+        // 4. Validasi File: Pastikan file tidak kosong
+        if (file == null || file.isEmpty()) {
+            throw new ApiException("Photo is mandatory for attendance", HttpStatus.BAD_REQUEST);
         }
 
         try {
+            // 5. Upload ke Firebase Storage
+            // Kita lakukan ini SEBELUM save ke DB agar jika upload gagal, DB tidak terisi
+            String uploadedUrl = firebaseStorageService.uploadImage(file);
+            log.info("Photo uploaded to Firebase: {}", uploadedUrl);
+
+            // 6. Build Entity dengan URL dari Firebase
             Attendance attendance = Attendance.builder()
                     .user(user)
                     .username(user.getUsername())
                     .attendanceDate(LocalDate.now())
                     .attendanceTimeIn(LocalTime.now())
-                    .photoUrl(request.getPhotoUrl())
+                    .photoUrl(uploadedUrl) // Menggunakan URL hasil upload tadi
                     .attendanceTimeInLatitude(request.getAttendanceTimeInLatitude())
                     .attendanceTimeInLongitude(request.getAttendanceTimeInLongitude())
                     .isValid(true)
@@ -62,10 +77,16 @@ public class AttendanceServiceImpl implements AttendanceService {
 
             attendance = attendanceRepository.save(attendance);
             log.info("Attendance saved successfully for user: {}", username);
+
             return mapToResponse(attendance);
+
+        } catch (IOException e) {
+            log.error("Firebase upload failed for user: {}", username, e);
+            throw new ApiException("Failed to upload photo to storage", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
-            log.error("Failed to save attendance for user: {}", username, e);
-            throw new ApiException("Failed to save attendance due to a database error", HttpStatus.INTERNAL_SERVER_ERROR);
+            log.error("Failed to save attendance for user: {}. Cause: {}", username, e.getMessage(), e);
+            throw new ApiException("Failed to save attendance: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -83,7 +104,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
-        
+
         return attendanceRepository.findByUser(user).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
@@ -97,7 +118,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .orElseThrow(() -> new ApiException("User not found", HttpStatus.NOT_FOUND));
 
         List<Attendance> attendances = attendanceRepository.findByUser(user);
-        
+
         long presentCount = attendances.stream().filter(a -> a.getIsValid()).count();
         long lateCount = attendances.stream().filter(a -> a.getAttendanceTimeIn().isAfter(LocalTime.of(8, 0))).count();
 
